@@ -15,28 +15,25 @@ exports.time = time;
 
 
 async function sendEmail(emailData) { 
-	var _Setting = await Setting.find().exec();
-	let settings = []
-	_.map(_Setting,function(value,key){
-	    settings[value.key] = value.value;
-	})
-	if(settings['MAIL_HOST'] ==""){
+	
+	
+	if(process.env.MAIL_HOST ==""){
 		return false;
 	}
 	let transporter = nodemailer.createTransport({
-	        host: settings['MAIL_HOST'],
-	       	port: settings['MAIL_PORT'],
+	        host: process.env.MAIL_HOST,
+	       	port: process.env.MAIL_PORT,
 	        secure: true,
 	        auth: {
-	            user: settings['MAIL_USERNAME'],
-	            pass: settings['MAIL_PASSWORD'],
+	            user: process.env.MAIL_USERNAME,
+	            pass: process.env.MAIL_PASSWORD,
 	        },
 	        logger: false,
 	        transactionLog: false, // include SMTP traffic in the logs
 	        allowInternalNetworkInterfaces: false
 	    },
 	    {
-	        from: settings['SITE_NAME'] + '<' + settings['MAIL_FROM_ADDRESS']+'>',
+	        from: process.env.SITE_NAME + '<' + process.env.MAIL_FROM_ADDRESS+'>',
 	        headers: {
 	            'X-Laziness-level': 1000 // just an example header, no need to use this
 	        }
