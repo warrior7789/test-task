@@ -1,0 +1,6 @@
+/node_modules
+.env
+/Project details
+/public/upload/users
+/public/upload/cms
+app_bk.js
