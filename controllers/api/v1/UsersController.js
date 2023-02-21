@@ -11,13 +11,30 @@ const isEmpty = require(rootpath + "/validation/is-empty");
 const path = require("path");
 const fs = require('fs');
 const absolutePath = path.resolve("./public/");
+const moment = require('moment')
 
 //http://localhost:8086/api/v1/sign-up
 async function Signup(req, res) {
     console.log("here");
     let data = {};
     try {
+        const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        
         const { email, password } = req.body;
+        var count = Object.keys(req.body).length
+        if(count > 2){
+            return res.status(400).json({
+                status:false,
+                message:"Invalid extra params pass"
+            });
+        }
+
+        if(!emailRegexp.test(email)){
+            return res.status(400).json({
+                status:false,
+                message:"Please enter Valid email id"
+            });
+        }
         if(isEmpty(email)){
             return res.status(400).json({
                 status:false,
@@ -61,6 +78,13 @@ exports.Signup = Signup;
 async function Login(req, res) {
     let data = {};
     try {
+        var count = Object.keys(req.body).length
+        if(count > 2){
+            return res.status(400).json({
+                status:false,
+                message:"Invalid extra params pass"
+            });
+        }
         const { email, password } = req.body;
         if(isEmpty(email)){
             return res.status(400).json({
@@ -159,6 +183,12 @@ async function AddTask(req, res){
                 message:"status required"
             });            
         }
+        if(status!="incomplete" || status!="completed"){
+            return res.status(400).json({
+                status:false,
+                message:"Invalid status pass should be incomplete, completed"
+            }); 
+        }
         if(isEmpty(date)){
             return res.status(400).json({
                 status:false,
@@ -166,10 +196,18 @@ async function AddTask(req, res){
             });            
         }
 
+        let date_check = moment(date, 'DD/MM/YYYY',true).isValid();
+        if(!date_check){
+            return res.status(400).json({
+                status:false,
+                message:"Invalid date format must DD/MM/YYYY"
+            }); 
+        }
+
         let NewTask = new TasksModel({
             task : task,
             status : status,
-            date : date,
+            date : moment(date,"DD/MM/YYYY").format("YYYY-MM-DD"),
             user:User
         }).save()
         
@@ -237,31 +275,7 @@ async function UpdateTask(req, res){
         let User = await Users.findOne({_id:req.user.user_id})
         const { task, status,date} = req.body;
         let task_id = req.params.task_id        
-        
-        /*if(isEmpty(task)){
-            return res.status(400).json({
-                status:false,
-                message:"Task Required field"
-            });            
-        }
-        if(isEmpty(status)){
-            return res.status(400).json({
-                status:false,
-                message:"status required"
-            });            
-        }
-        if(isEmpty(date)){
-            return res.status(400).json({
-                status:false,
-                message:"Date required"
-            });            
-        }*/
-        /*if(isEmpty(task_id)){
-            return res.status(400).json({
-                status:false,
-                message:"Task id required"
-            });            
-        }*/
+       
 
         
         let Task = await TasksModel.findOne({
@@ -271,15 +285,30 @@ async function UpdateTask(req, res){
         if(!isEmpty(Task)){
             
             if(!isEmpty(Task)){
+
+
                 Task.task = task
             }
             
             if(!isEmpty(status)){
+                if(status!="incomplete" && status!="completed"){
+                    return res.status(400).json({
+                        status:false,
+                        message:"Invalid status pass should be incomplete, completed"
+                    }); 
+                }
                 Task.status = status
             }
 
             if(!isEmpty(date)){
-                Task.date = date
+                let date_check = moment(date, 'DD/MM/YYYY',true).isValid();
+                if(!date_check){
+                    return res.status(400).json({
+                        status:false,
+                        message:"Invalid date format must DD/MM/YYYY"
+                    }); 
+                }
+                Task.date = moment(date,"DD/MM/YYYY").format("YYYY-MM-DD")
             }
 
             await Task.save()

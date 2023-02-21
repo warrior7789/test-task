@@ -24,7 +24,7 @@
     "http": "0.0.1-security",
     "http-proxy-middleware": "^2.0.6",
     "jsonwebtoken": "^8.5.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "mongodb-snapshot": "^1.4.1",
     "mongoose": "^5.5.13",
     "mongoose-beautiful-unique-validation": "^7.1.1",
