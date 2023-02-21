@@ -13,7 +13,7 @@ const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const bodyParser = require('body-parser');   
 require("dotenv").config();
-const port = process.env.PORT || "8000";
+const port = process.env.PORT || "3000";
 console.log("Test");
 // Required module 
 app.use(expressValidator());
