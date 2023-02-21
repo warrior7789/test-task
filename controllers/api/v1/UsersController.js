@@ -183,7 +183,7 @@ async function AddTask(req, res){
                 message:"status required"
             });            
         }
-        if(status!="incomplete" || status!="completed"){
+        if(status!="incomplete" && status!="completed"){
             return res.status(400).json({
                 status:false,
                 message:"Invalid status pass should be incomplete, completed"
