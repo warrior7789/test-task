@@ -22,6 +22,7 @@ app.use(fileUpload());
 
 global.connectPool = require('./config/db.js');    
   
+var message_model = require('./models/message');
 // Constants 
 global.nodeSiteUrl = process.env.SITE_URL; // node  
 global.SiteUrl = process.env.SITE_URL; // node  
@@ -65,6 +66,15 @@ app.get('/', (req, res) => {
 
 require('./routes/api_v1')
 
+
+app.get('/chat',async (req, res) => {
+    let msg = await message_model.find()
+    console.log(msg)
+    res.setHeader('content-type' , 'text/html; charset=mycharset');  
+    res.render('chat',{
+        msg:msg
+    });
+});
 app.use('*', (req, res) => {
   res.status(404).json({
     success: 'false',
@@ -76,7 +86,25 @@ app.use('*', (req, res) => {
   });
 });
 
+
+
 var server = app.listen(port, function () {
     //console.log("Server running on port %s", server.address().port);
     console.log("Server running on port "+process.env.SITE_URL, server.address().port);
 });  
+
+const { Server } = require("socket.io");
+const io = new Server(server);
+io.on('connection', (socket) => {
+  console.log('a user connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+
+    socket.on('chat message', (msg) => {
+        let message_model_ = new message_model({
+            message:msg
+        }).save()
+        io.emit('chat message', msg);
+    });
+});
