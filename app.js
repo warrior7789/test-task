@@ -69,7 +69,7 @@ require('./routes/api_v1')
 
 app.get('/chat',async (req, res) => {
     let msg = await message_model.find()
-    console.log(msg)
+    //console.log(msg)
     res.setHeader('content-type' , 'text/html; charset=mycharset');  
     res.render('chat',{
         msg:msg
